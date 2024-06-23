@@ -1,0 +1,224 @@
+
+# **LABOLATORIUM 2**
+
+ZADANIE 1.
+
+1
+
+select nazwa,ulica,miejscowosc from klienci
+
+order by nazwa
+
+2
+
+select * from klienci
+
+order by miejscowosc DESC,
+
+nazwa
+
+3
+
+select * from klienci
+
+WHERE (miejscowosc='Kraków'
+
+or miejscowosc='Warszawa')
+
+order by miejscowosc DESC,
+
+nazwa
+
+4
+
+select * from klienci
+
+WHERE miejscowosc in ('Kraków' ,
+
+'Warszawa')
+
+order by miejscowosc DESC,
+
+nazwa
+
+5
+
+select * from klienci
+
+order by miejscowosc DESC
+
+6
+
+select * from klienci
+
+where miejscowosc='Kraków'
+
+order by nazwa
+
+ZADANIE 2
+
+1
+
+select nazwa, masa from czekoladki
+
+where masa>20
+
+2
+
+select nazwa, masa ,koszt from czekoladki
+
+where masa>25 and koszt> 0.25
+
+3
+
+select nazwa, masa ,koszt from czekoladki
+
+where masa>25 and koszt> 25*0.01
+
+4
+
+select nazwa, czekolada ,nadzienie, orzechy from czekoladki
+
+where (czekolada='mleczna' and nadzienie='maliny')
+
+or (czekolada='mleczna' and nadzienie='truskawki')
+
+or (orzechy='laskowe' and czekolada!='gorzka')
+
+5
+
+select nazwa, koszt from czekoladki
+
+where koszt> 0.25
+
+6
+
+select nazwa, czekolada from czekoladki
+
+where czekolada in ('biała','mleczna')
+
+ZADANIE 3
+
+1
+
+select 124*7 +45 ->	913
+
+2
+
+select pow(2,20) -> 1048576
+
+3
+
+select sqrt(3) -> 1.7320508075688772
+
+4
+
+select pi() -> 3.141592653589793
+
+ZADANIE 4
+
+1
+
+select idczekoladki,nazwa,czekolada ,orzechy,nadzienie from czekoladki
+
+where (masa>14 and masa<25)
+
+2
+
+select idczekoladki,nazwa,czekolada ,orzechy,nadzienie from czekoladki
+
+where (masa>24 and masa<36)
+
+3
+
+select idczekoladki,nazwa,czekolada ,orzechy,nadzienie from czekoladki
+
+where (masa>24 and masa<36) and (koszt>0.14 and koszt <0.25)
+
+ZADANIE 5
+
+1
+
+select idczekoladki,nazwa,czekolada ,orzechy,nadzienie from czekoladki
+
+where orzechy is distinct from null
+
+2
+
+select idczekoladki,nazwa,czekolada ,orzechy,nadzienie from czekoladki
+
+where orzechy is not null
+
+3
+
+select idczekoladki,nazwa,czekolada ,orzechy,nadzienie from czekoladki
+
+where orzechy is  null
+
+4
+
+select idczekoladki,nazwa,czekolada ,orzechy,nadzienie from czekoladki
+
+where orzechy is not null
+
+or nadzienie is not null
+
+5
+
+select idczekoladki,nazwa,czekolada ,orzechy,nadzienie from czekoladki
+
+where czekolada in ('mleczna','biała')
+
+and orzechy is null
+
+6
+
+select idczekoladki,nazwa,czekolada ,orzechy,nadzienie from czekoladki
+
+where czekolada not in ('mleczna','biała')
+
+and (orzechy is not null or nadzienie is not null)
+
+7
+
+select idczekoladki,nazwa,czekolada ,orzechy,nadzienie from czekoladki
+
+where nadzienie is not null
+
+8
+
+select idczekoladki,nazwa,czekolada ,orzechy,nadzienie from czekoladki
+
+where nadzienie is null
+
+9
+
+select idczekoladki,nazwa,czekolada ,orzechy,nadzienie from czekoladki
+
+where nadzienie is null
+
+and orzechy is null
+
+10
+
+select idczekoladki,nazwa,czekolada ,orzechy,nadzienie from czekoladki
+
+where czekolada in ('biała','mleczna')
+
+and nadzienie is null
+
+ZADANIE 6
+
+W terminalu logujemy się na ssh piszemy w plikach
+
+\i skrypt1.sql
+
+select * from czekoladki
+
+where (masa > 14 and masa < 25) or (koszt > 14 and koszt <25)
+
+select * from czekoladki
+
+where (masa > 14 and masa <25 and koszt>0.14 and koszt< 0.24)
+
+or (masa >24 and masa< 36 and koszt >0.14 and koszt < 0.36)
