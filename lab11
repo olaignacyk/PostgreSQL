@@ -1,0 +1,45 @@
+zad 1 
+
+1
+
+`create or replace FUNCTION *masaPudelka*(in arg1 character(4))returns integer as    $$    DECLARE        wynik INTEGER;    BEGIN        select *sum*(cz.masa*z.sztuk) into wynik from cukiernia.zawartosc z        inner join cukiernia.czekoladki cz using(idczekoladki)        where idpudelka=arg1;    RETURN wynik;    END;    $$ LANGUAGE plpgsql;`
+
+2
+
+`create or replace function *liczbaCzekoladek*(in arg1 char(4))returns integer as    $$    DECLARE        wynik integer;    BEGIN        select *sum*(sztuk) into wynik from cukiernia.zawartosc        where idpudelka=arg1;    RETURN wynik;    end;    $$ language plpgsql;`
+
+zad 2
+
+1
+
+`create or replace function *zysk*(in arg1 character(4))returns numeric(10,2) as    $$    DECLARE        wynik NUMERIC(10,2);    BEGIN        with cena_w as(select idpudelka,*sum*(z.sztuk*c.koszt) as ile from cukiernia.zawartosc z                                                join cukiernia.czekoladki c using(idczekoladki)                                                group by idpudelka    )        select p.cena-cena_w.ile-0.90 into wynik from cukiernia.pudelka p join cena_w using(idpudelka)            where idpudelka=arg1;        return wynik;    END;    $$ language plpgsql;SELECT *zysk*('alls');`
+
+2
+
+`select *sum*(*zysk*(a.idpudelka)*a.sztuk)from cukiernia.zamowienia znatural join cukiernia.artykuly awhere z.datarealizacji>='2013-11-11'and z.datarealizacji<='2013-11-17';`
+
+zad 3
+
+1
+
+`create or replace function *sumaZamowien*(in arg1 integer)returns numeric(7,2) as    $$    declare        wynik numeric(7,2);    BEGIN        select *sum*(p.cena*a.sztuk) into wynik from cukiernia.zamowienia z            join cukiernia.artykuly a using(idzamowienia)        join cukiernia.pudelka p using(idpudelka)        where idklienta=arg1        group by idklienta;        return wynik;    END;    $$ language plpgsql;`
+
+2
+
+`create or replace function *rabat*(in arg1 integer)returns integer as    $$    declare    wynik integer;    wartosc_zam integer;    BEGIN        select *sum*(a.sztuk*p.cena) into wartosc_zam from cukiernia.zamowienia        natural join cukiernia.artykuly a        natural join cukiernia.pudelka p        where idklienta=arg1;        if wartosc_zam between 101 and 200 then            wynik:=4;        elsif wartosc_zam between 201 and 400 then            wynik :=7;        elsif wartosc_zam > 400 then            wynik :=8;        else            wynik :=0;        end if;        return wynik;    end;    $$ language plpgsql;`
+
+zad 4
+
+`create or replace function *podwyzka*()returns void as    $$    declare        zmienna numeric(7,2);    declare c1 record;    declare c2 record;    BEGIN        for c1 in select * from cukiernia.czekoladki        loop            zmienna:= case                when c1.koszt<0.20 then 0.03                when c1.koszt between 0.20 and 0.29 then 0.04                else 0.05 end;        update cukiernia.czekoladki            set koszt= koszt+zmienna where idczekoladki=c1.idczekoladki;        for c2 in select * from cukiernia.zawartosc where idczekoladki=c1.idczekoladki            loop                update cukiernia.pudelka set cena=cena+ (zmienna*c2.sztuk) where idpudelka=c2.idpudelka;            end loop;    end loop;end;$$ language plpgsql`;
+
+zad 6
+
+1
+
+`create or replace function *listaZamowien*(in arg1 integer)returns table (    res_idazamowienia integer,    res_idpudelka integer,    rea_datarealizacji date              ) as$$    declare c record;    begin    return query select idzamowienia,idpudelka,datarealizacji as c        from cukiernia.klienci        natural join cukiernia.zamowienia        natural join cukiernia.artykuly        where idklienta=arg1;    end;    $$ language plpgsql;`
+
+2
+
+`create or replace function *listaKlientow*(in arg1 varchar(15))returns table(    res_nazwa varchar(130),    res_ulica varchar(30),    res_miejscowosc varchar(15),    res_kod char(6)             ) as    $$    begin        return query select  nazwa, ulica, miejscowosc, kod as r        from cukiernia.klienci        where miejscowosc=arg1;    end;$$ language plpgsql;select * from *listaKlientow*('Katowice');`
+
+zad 7
