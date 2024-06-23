@@ -1,0 +1,131 @@
+`select datarealizacji, idzamowienia from cukiernia.zamowieniawhere idzamowienia in (    select z.idzamowienia from cukiernia.zamowienia z             join cukiernia.klienci k using(idklienta)             where k.nazwa ilike '%antoni%');`
+
+`select datarealizacji , idzamowienia from cukiernia.zamowieniawhere idzamowienia in (    select z.idzamowienia from cukiernia.zamowienia z                          join cukiernia.klienci k using(idklienta)                          where k.ulica ilike '%/%'    );`
+
+`select datarealizacji, idzamowienia from cukiernia.zamowieniawhere idzamowienia in(    select z.idzamowienia from cukiernia.zamowienia z                          join cukiernia.klienci k using(idklienta)                          where k.miejscowosc ilike 'Kraków'    )and *date_part*('month',datarealizacji)=11 and    *date_part*('year',datarealizacji)=2013;`
+
+zad3
+
+1
+
+`select distinct nazwa,ulica,miejscowosc from cukiernia.klienciwhere idklienta in (select idklienta from cukiernia.zamowienia                       where *date_part*('day',datarealizacji)=12 and                             *date_part*('month',datarealizacji)=11 and                             *date_part*('year',datarealizacji)=2013);`
+
+`select distinct nazwa,ulica,miejscowosc from cukiernia.kliencinatural join cukiernia.zamowieniawhere *date_part*('day',datarealizacji)=12 and                             *date_part*('month',datarealizacji)=11 and                             *date_part*('year',datarealizacji)=2013;`
+
+2
+
+`select distinct nazwa,ulica,miejscowosc from cukiernia.klienciwhere idklienta in (select idklienta from cukiernia.zamowienia                       where *date_part*('month',datarealizacji)=11);`
+
+3
+
+`select distinct nazwa,ulica,miejscowosc from cukiernia.klienciwhere idklienta in ( select distinct idklienta from cukiernia.zamowienia                                      natural join cukiernia.artykuly                                      natural join cukiernia.pudelka                                      where pudelka.nazwa in ('Kremowa fantazja','Kolekcja jesienna')    )`
+
+4
+
+`select distinct nazwa,ulica,miejscowosc from cukiernia.klienciwhere idklienta in (select distinct idklienta from cukiernia.zamowienia                 natural join cukiernia.artykuly                natural join cukiernia.pudelka            where sztuk>=2              and pudelka.nazwa in ('Kremowa fantazja','Kolekcja jesienna'                                              ));`
+
+5
+
+`select distinct nazwa,ulica,miejscowosc from cukiernia.klienciwhere idklienta in (    select distinct idklienta from cukiernia.zamowienia                              natural join cukiernia.artykuly                              where idpudelka in(                                  select distinct idpudelka from cukiernia.zawartosc                                                            natural join cukiernia.czekoladki                                                            where orzechy ilike 'migdały'                                  )    );`
+
+6
+
+`select distinct nazwa,ulica,miejscowosc from cukiernia.klienciwhere *exists* ( select zamowienia.idklienta from cukiernia.zamowienia                                           where klienci.idklienta=zamowienia.idklienta)`;
+
+7
+
+`SELECT nazwa,ulica,miejscowosc FROM cukiernia.klienci k WHERE NOT *EXISTS* (SELECT z.* FROM cukiernia.zamowienia z WHERE z.idklienta = k.idklienta)`;
+
+zad 4
+
+1
+
+`select distinct p.nazwa,p.opis,p.cena from cukiernia.pudelka pwhere *exists* (select * from cukiernia.zawartosc                      join cukiernia.czekoladki using(idczekoladki)                      where idczekoladki ilike 'D09' and p.idpudelka=zawartosc.idpudelka);`
+
+2
+
+`select distinct p.nazwa,p.opis,p.cena,p.idpudelka from cukiernia.pudelka pwhere *exists* (select * from cukiernia.zawartosc                      join cukiernia.czekoladki using(idczekoladki)                      where czekoladki.nazwa ilike 'Gorzka truskawkowa' and p.idpudelka=zawartosc.idpudelka);`
+
+3
+
+`select distinct  p.nazwa,p.opis,p.cena from cukiernia.pudelka pwhere idpudelka=any (select idpudelka from cukiernia.zawartosc    join cukiernia.czekoladki using(idczekoladki)                                      where czekoladki.nazwa ~ '^S');`
+
+4
+
+`select distinct p.nazwa,p.opis,p.cena from cukiernia.pudelka pwhere idpudelka in (    select idpudelka from cukiernia.zawartosc                     where sztuk >=4    );`
+
+5
+
+`select distinct p.nazwa,p.opis, p.cena from cukiernia.pudelka pwhere *exists* (select * from cukiernia.zawartosc                       join cukiernia.czekoladki using(idczekoladki)                       where sztuk>=3 and czekoladki.nazwa ilike'Gorzka truskawkowa' and p.idpudelka=zawartosc.idpudelka);`
+
+6
+
+`select distinct p.nazwa,p.opis, p.cena from cukiernia.pudelka pwhere idpudelka in (select idpudelka from cukiernia.zawartosc                                     join cukiernia.czekoladki using(idczekoladki)                                     where nadzienie ~'truskawki');`
+
+`select distinct p.nazwa,p.opis, p.cena from cukiernia.pudelka pwhere *exists* (select * from cukiernia.zawartosc                                     join cukiernia.czekoladki using(idczekoladki)                                     where nadzienie ~'truskawki' and p.idpudelka=zawartosc.idpudelka);`
+
+7
+
+`select distinct p.nazwa,p.opis, p.cena from cukiernia.pudelka pwhere not *exists* (select * from cukiernia.zawartosc                                     join cukiernia.czekoladki using(idczekoladki)                                     where czekolada ~'gorzka' and p.idpudelka=zawartosc.idpudelka);`
+
+`select distinct p.nazwa,p.opis, p.cena from cukiernia.pudelka pwhere idpudelka not in (select zawartosc.idpudelka from cukiernia.zawartosc                                     join cukiernia.czekoladki using(idczekoladki)                                     where czekolada ~'gorzka');`
+
+8
+
+`select p.nazwa,p.opis,p.cena from cukiernia.pudelka pwhere idpudelka not in(select zawartosc.idpudelka from cukiernia.zawartosc                          join cukiernia.czekoladki using(idczekoladki)                          where czekolada ilike 'gorzka' );`
+
+9
+
+`select distinct p.idpudelka,p.nazwa,p.opis from cukiernia.pudelka pwhere *exists* (select idpudelka from cukiernia.zawartoscjoin cukiernia.czekoladki using (idczekoladki)                               where nadzienie ilike '' and p.idpudelka=zawartosc.idpudelka);`
+
+zad5
+
+1
+
+`select distinct czek.idczekoladki,czek.nazwa from cukiernia.czekoladki czekwhere czek.koszt > any (select c.koszt from cukiernia.czekoladki c where c.idczekoladki ~'d08');`
+
+2
+
+`select distinct k.nazwafrom cukiernia.klienci knatural join cukiernia.zamowienia znatural join cukiernia.artykuly awhere idpudelka in (select a.idpudelkafrom cukiernia.klienci knatural join cukiernia.zamowienia znatural join cukiernia.artykuly awhere k.nazwa ilike 'Górka Alicja')and k.nazwa not ilike 'Górka Alicja';`
+
+3
+
+select distinct k.nazwa
+
+from cukiernia.klienci k
+
+natural join cukiernia.zamowienia z
+
+natural join cukiernia.artykuly a
+
+where idpudelka in (select a.idpudelka
+
+from cukiernia.klienci k1
+
+natural join cukiernia.zamowienia z1
+
+natural join cukiernia.artykuly a1
+
+where k1.miejscowosc ilike 'katowice')
+
+and k.miejscowosc not ilike 'katowice';
+
+zad6
+
+1
+
+`select *max*(p) from (select idpudelka,*sum*(sztuk) as p from cukiernia.zawartosc group by idpudelka) l;`
+
+2
+
+`select *min*(p) from (select idpudelka,*sum*(sztuk) as p from cukiernia.zawartosc group by idpudelka) l;`
+
+3
+
+`select idpudelka,p from (select idpudelka,*sum*(sztuk) as p from cukiernia.zawartosc group by idpudelka) lwhere p>(select *avg*(o) from (select idpudelka,*sum*(sztuk) as o from cukiernia.zawartosc group by idpudelka)pp ) ;`
+
+4
+
+`select *max*(p) as maxi, *min*(p) as mini from (select idpudelka,*sum*(sztuk) as p from cukiernia.zawartosc group by idpudelka) l`
+
+`select distinct p.nazwa,p.opis, p.cena from cukiernia.pudelka pwhere not *exists* (select * from cukiernia.zawartosc                                     join cukiernia.czekoladki using(idczekoladki)                                     where czekolada ~'gorzka' and p.idpudelka=zawartosc.idpudelka);`
