@@ -1,0 +1,372 @@
+# LABORATORIUM 5
+
+ZADANIE 1
+
+1
+
+select *count*(czekoladki) from cukiernia.czekoladki;
+
+2
+
+select *count*(*) from cukiernia.czekoladki
+
+where nadzienie not ilike '';
+
+(u mnie nie działa ale na pgadmin tak)
+select *count*(nadzienie) from cukiernia.czekoladki;
+
+3
+
+select idpudelka from cukiernia.zawartosc
+
+group by idpudelka
+
+order by *sum*(sztuk) DESC
+
+limit 1;
+
+4
+
+select idpudelka,*sum*(sztuk) from cukiernia.zawartosc
+
+group by idpudelka;
+
+5
+
+```jsx
+SELECT p.idpudelka, COALESCE(bez.liczba, 0)
+FROM
+    pudelka p
+    LEFT JOIN (
+        SELECT z.idpudelka, SUM(z.sztuk) AS liczba
+        FROM zawartosc z JOIN czekoladki c ON z.idczekoladki = c.idczekoladki
+        WHERE c.orzechy IS NULL
+        GROUP BY z.idpudelka
+    ) bez USING (idpudelka)
+
+```
+
+6
+
+select p.idpudelka, coalesce( bez.liczba,0)
+from pudelka p
+left join
+(select z.idpudelka, sum(z.sztuk) as liczba
+from zawartosc z join czekoladki cz on z.idczekoladki=cz.idczekoladki
+where cz.czekolada ilike 'mleczna'
+group by idpudelka) bez using (idpudelka)
+
+ZADANIE 2
+
+1
+
+select p.idpudelka, *sum*(c.masa*z.sztuk) as masa
+
+from cukiernia.czekoladki c
+
+join cukiernia.zawartosc z using(idczekoladki)
+
+join cukiernia.pudelka p using(idpudelka)
+
+group by p.idpudelka;
+
+2
+
+select p.idpudelka, *sum*(c.masa*z.sztuk) as masa
+
+from cukiernia.czekoladki c
+
+join cukiernia.zawartosc z using(idczekoladki)
+
+join cukiernia.pudelka p using(idpudelka)
+
+group by p.idpudelka
+
+order by masa DESC
+
+limit 1;
+
+3
+
+select *avg*(pp.mas)
+
+from cukiernia.pudelka p
+
+left join(
+
+select z.idpudelka, *sum*(cz.masa) as mas
+
+from cukiernia.zawartosc z
+
+join cukiernia.czekoladki cz using(idczekoladki)
+
+group by z.idpudelka)
+
+pp using(idpudelka);
+
+4
+
+SELECT p.idpudelka, (SUM(cz.masa*z.sztuk) / SUM(z.sztuk)) as srednia
+FROM
+czekoladki cz
+ JOIN zawartosc z ON cz.idczekoladki = z.idczekoladki
+ JOIN pudelka p ON z.idpudelka = p.idpudelka
+GROUP BY p.idpudelka
+
+ZADANIE 3
+
+1
+
+select datarealizacji, *count*(idzamowienia)from cukiernia.zamowieniagroup by datarealizacji;
+
+2
+
+`select *count*(*) from cukiernia.zamowienia;`
+
+3
+
+`select *sum*(a.sztuk *w.wartosc)` 
+
+`from cukiernia.zamowienia`
+
+`join cukiernia.artykuly a using(idzamowienia)`
+
+`join(`
+
+`select idpudelka, *sum*(z.sztuk*cz.koszt) as wartosc     from cukiernia.zawartosc z    n`
+
+`atural join cukiernia.czekoladki cz`
+
+`group by idpudelka)`
+
+ `w using (idpudelka);`
+
+4
+
+`select idklienta, *count*(idzamowienia), *sum*(idzam)`
+
+`from  cukiernia.zamowienia`
+
+`join (` 
+
+   `select idzamowienia,*sum*(a.sztuk*pp.wartosc) as idzam`    
+
+`from cukiernia.zamowienia`
+
+`natural join cukiernia.artykuly a`
+
+`join (select idpudelka, *sum*(z.sztuk*cz.koszt) as wartosc`     
+
+`from cukiernia.zawartosc z`    
+
+`natural join cukiernia.czekoladki cz`
+
+`group by idpudelka)`
+
+ `pp using(idpudelka)`
+
+`group by idzamowienia)` 
+
+`using (idzamowienia)`
+
+`natural join cukiernia.klienci`
+
+`group by idklienta;`
+
+ZADANIE 4
+
+1
+
+`select idczekoladki,*sum*(sztuk)`
+
+`from cukiernia.zawartosc`
+
+`natural join cukiernia.pudelka`
+
+`group by idczekoladki`
+
+`order by 2 desc`
+
+`limit 1`
+
+2
+
+`select idpudelka,*sum(*case when cz.orzechy ilike '' then 1 else 0 end)as ilosc`
+
+`from cukiernia.zawartosc z`
+
+`natural join cukiernia.czekoladki cz`
+
+`group by idpudelka`
+
+`order by ilosc desc;`
+
+WITH xyz AS (
+    SELECT pud.idpudelka, SUM(zaw.sztuk) AS liczba
+    FROM
+        pudelka pud
+        INNER JOIN zawartosc zaw USING(idpudelka)
+        INNER JOIN czekoladki cz USING(idczekoladki)
+    WHERE cz.orzechy IS NULL
+    GROUP BY pud.idpudelka
+)
+SELECT p.idpudelka
+FROM
+    pudelka p
+    INNER JOIN zawartosc z USING (idpudelka)
+    INNER JOIN czekoladki czz USING (idczekoladki)
+WHERE czz.orzechy IS NULL
+GROUP BY p.idpudelka
+HAVING SUM(z.sztuk) = (SELECT MAX(xyz.liczba) FROM xyz)
+
+3
+
+`select idczekoladki ,*sum*(case when sztuk is null then 0 else sztuk end)`
+
+`from cukiernia.zawartosc`
+
+`join cukiernia.pudelka` 
+
+`using(idpudelka)`
+
+`group by idczekoladki`
+
+`order by 2`
+
+`limit 1;`]
+
+```
+WITH xyz AS (
+    SELECT cz.idczekoladki, COUNT(zaw.idczekoladki) AS liczba
+    FROM
+        czekoladki cz
+        LEFT JOIN zawartosc zaw USING(idczekoladki)
+    GROUP BY cz.idczekoladki
+)
+SELECT cz.idczekoladki
+FROM
+    czekoladki cz
+    LEFT JOIN zawartosc zaw USING(idczekoladki)
+GROUP BY cz.idczekoladki
+HAVING COUNT(zaw.idczekoladki) = (SELECT MIN(xyz.liczba) FROM xyz)
+```
+
+4
+
+SELECT a.idpudelka
+FROM artykuly a
+GROUP BY a.idpudelka
+ORDER BY COUNT(*) DESC
+LIMIT 1
+
+ZADANIE 5
+
+1
+
+`select *date_part*('quarter',datarealizacji)as kwartal ,*count*(idzamowienia)`
+
+`from cukiernia.zamowienia`
+
+`group by kwartal;`
+
+2
+
+`select *date_part*('month',datarealizacji)  as miesiac ,*count*(idzamowienia)`
+
+`from cukiernia.zamowienia`
+
+`group by miesiac;`
+
+3
+
+`select *date_part*('week',datarealizacji) as tydzien ,*count*(idzamowienia)`
+
+`from cukiernia.zamowienia`
+
+`group by tydzien;`
+
+4
+
+`select miejscowosc,*count*(idzamowienia)`
+
+`from cukiernia.zamowienia`
+
+`natural join cukiernia.klienci`
+
+`group by miejscowosc;`
+
+ZADANIE 6
+
+1
+
+`select *sum*(k.masa)` 
+
+`from cukiernia.pudelka`
+
+`join (    select idpudelka ,*sum*(masa*sztuk) as masa` 
+
+`from cukiernia.zawartosc`        
+
+`natural join cukiernia.czekoladki`   
+
+ `group by idpudelka)` 
+
+`k using (idpudelka)`
+
+2
+
+`select *sum*(kosztp) from cukiernia.pudelka`
+
+`join(`    
+
+`select p.idpudelka,*sum*(cz.koszt*z.sztuk) as kosztp`    
+
+`from cukiernia.pudelka  p`    
+
+`join cukiernia.zawartosc z` 
+
+`using(idpudelka)`    
+
+`join cukiernia.czekoladki cz using(idczekoladki)`    
+
+`group by p.idpudelka) xyz using (idpudelka)`
+
+ZADANIE 7
+
+1
+
+`select idpudelka,(cena-xyz.pud)`  
+
+`from cukiernia.pudelka`    
+
+`join (` 
+
+   `select idpudelka,*sum*(koszt*sztuk) as pud` 
+
+`from cukiernia.zawartosc`
+
+`join cukiernia.czekoladki` 
+
+`using(idczekoladki)`
+
+`group by idpudelka) xyz using (idpudelka)`
+
+2
+
+`select *sum*(a.sztuk*g.zysk)from cukiernia.artykuly ajoin (select p.idpudelka,p.cena-pp.cen as zysk from cukiernia.pudelka pjoin (    select z.idpudelka,*sum*(cz.koszt*z.sztuk) as cen from cukiernia.zawartosc z                                             join cukiernia.czekoladki cz using(idczekoladki)                                             group by z.idpudelka)pp using(idpudelka))g using (idpudelka)`
+
+3
+
+`select *sum*(zz.koszty) from cukiernia.artykuly`
+
+`join(select idpudelka, (cena - xyz.pud) as koszty`     
+
+`from cukiernia.pudelka`              
+
+`join (select idpudelka, *sum*(koszt * sztuk) as pud                    from cukiernia.zawartosc`                            
+
+`join cukiernia.czekoladki using (idczekoladki)                    group by idpudelka) xyz using (idpudelka))zz using (idpudelka);`
+
+ZADANIE 8
+
+`select *ROW_NUMBER*() OVER( ORDER BY  idpudelka) AS Pozycja,idpudelka from cukiernia.pudelka`
